@@ -13,6 +13,7 @@ class Song extends File {
     private Map<String, Frame> frameList;
     private InfoGetter infoGetter;
     private InfoSetter infoSetter;
+    private int tagSize;
 
  /*  private String bandName;
     private String albumName;
@@ -25,7 +26,15 @@ class Song extends File {
         infoGetter = new InfoGetter();
         infoSetter = new InfoSetter(this);
         frameList = setFrameList();
-   //     infoGetter.readInfo(this);
+        //     infoGetter.readInfo(this);
+    }
+
+    public void setTagSize(int tagSize){
+        this.tagSize = tagSize;
+    }
+
+    public int getTagSize() {
+        return tagSize;
     }
 
     private Map<String, Frame> setFrameList() {
@@ -40,8 +49,8 @@ class Song extends File {
         return stringFrameMap;
     }
 
-     Map<String, Frame> getFrameList() {
-         return frameList;
+    Map<String, Frame> getFrameList() {
+        return frameList;
     }
 
     void readInfo() {
@@ -52,7 +61,7 @@ class Song extends File {
         if (frameList.get(FrameTypes.BAND).getFrameValue() != null) {
             infoSetter.setInfo(this, frameList.get(FrameTypes.BAND), value);
         } else {
-            infoSetter.setInfoToNewFrame(this, frameList.get(FrameTypes.BAND), value);
+            infoSetter.setNewFrameInfo(this, frameList.get(FrameTypes.BAND), value);
         }
     }
 
@@ -60,7 +69,7 @@ class Song extends File {
         if (frameList.get(FrameTypes.ALBUM).getFrameValue() != null) {
             infoSetter.setInfo(this, frameList.get(FrameTypes.ALBUM), value);
         } else {
-            infoSetter.setInfoToNewFrame(this, frameList.get(FrameTypes.ALBUM), value);
+            infoSetter.setNewFrameInfo(this, frameList.get(FrameTypes.ALBUM), value);
         }
     }
 
@@ -68,7 +77,7 @@ class Song extends File {
         if (frameList.get(FrameTypes.SONG).getFrameValue() != null) {
             infoSetter.setInfo(this, frameList.get(FrameTypes.SONG), value);
         } else {
-            infoSetter.setInfoToNewFrame(this, frameList.get(FrameTypes.SONG), value);
+            infoSetter.setNewFrameInfo(this, frameList.get(FrameTypes.SONG), value);
         }
     }
 
@@ -76,7 +85,7 @@ class Song extends File {
         if (frameList.get(FrameTypes.YEAR).getFrameValue() != null) {
             infoSetter.setInfo(this, frameList.get(FrameTypes.YEAR), value);
         } else {
-            infoSetter.setInfoToNewFrame(this, frameList.get(FrameTypes.YEAR), value);
+            infoSetter.setNewFrameInfo(this, frameList.get(FrameTypes.YEAR), value);
         }
     }
 
@@ -84,28 +93,32 @@ class Song extends File {
         if (frameList.get(FrameTypes.GENRE).getFrameValue() != null) {
             infoSetter.setInfo(this, frameList.get(FrameTypes.GENRE), value);
         } else {
-            infoSetter.setInfoToNewFrame(this, frameList.get(FrameTypes.GENRE), value);
+            infoSetter.setNewFrameInfo(this, frameList.get(FrameTypes.GENRE), value);
         }
     }
 
     public String getBandName() {
-        return frameList.get(FrameTypes.BAND).getFrameValue();
-        //return frameList.get(FrameTypes.BAND) != null ? frameList.get(FrameTypes.BAND).getFrameValue() : "";
+        return frameList.get(FrameTypes.BAND) != null && frameList.get(FrameTypes.BAND).getFrameValue() != null
+                ? frameList.get(FrameTypes.BAND).getFrameValue() : "";
     }
 
     public String getSongName() {
-        return frameList.get(FrameTypes.SONG) != null ? frameList.get(FrameTypes.SONG).getFrameValue() : "";
+        return frameList.get(FrameTypes.SONG) != null && frameList.get(FrameTypes.SONG).getFrameValue() != null
+                ? frameList.get(FrameTypes.SONG).getFrameValue() : "";
     }
 
     public String getAlbumName() {
-        return frameList.get(FrameTypes.ALBUM) != null ? frameList.get(FrameTypes.ALBUM).getFrameValue() : "";
+        return frameList.get(FrameTypes.ALBUM) != null && frameList.get(FrameTypes.ALBUM).getFrameValue() != null
+                ? frameList.get(FrameTypes.ALBUM).getFrameValue() : "";
     }
 
     public String getYear() {
-        return frameList.get(FrameTypes.YEAR) != null ? frameList.get(FrameTypes.YEAR).getFrameValue() : "";
+        return frameList.get(FrameTypes.YEAR) != null && frameList.get(FrameTypes.YEAR).getFrameValue() != null
+                ? frameList.get(FrameTypes.YEAR).getFrameValue() : "";
     }
 
     public String getGenre() {
-        return frameList.get(FrameTypes.GENRE) != null ? frameList.get(FrameTypes.GENRE).getFrameValue() : "";
+        return frameList.get(FrameTypes.GENRE) != null && frameList.get(FrameTypes.GENRE).getFrameValue() != null
+                ? frameList.get(FrameTypes.GENRE).getFrameValue() : "";
     }
 }

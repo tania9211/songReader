@@ -9,19 +9,19 @@ class Frame {
     private String frameValue;
     private int frameSize;
     private int positionInFile;
-    private long tagSize;
+  //  private int tagSize;
 
     public Frame(String frameName) {
         this.frameName = frameName;
     }
 
-    public long getTagSize() {
+  /*  public int getTagSize() {
         return tagSize;
     }
 
-    public void setTagSize(long tagSize){
+    public void setTagSize(int tagSize){
         this.tagSize = tagSize;
-    }
+    }*/
 
     public String getFrameName() {
         return frameName;
