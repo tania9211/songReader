@@ -15,10 +15,10 @@ public class InfoGetter {
             FileInputStream fileInputStream = new FileInputStream(song);
             headerArray = new byte[Config.HEADER_ARRAY_SIZE];
             fileInputStream.read(headerArray);
-            long tagSize = this.getTagSize();
-            byte[] buffer = new byte[(int)tagSize];
-            System.out.println(this.getTagSize());
-         //    song.setTagSize(this.getTagSize());  // temp
+            int tagSize = this.getTagSize() + 10;
+            byte[] buffer = new byte[tagSize];
+            song.setTagSize(tagSize);
+            
             int lenght = buffer.length;
             int pos = 0;
             fileInputStream.read(buffer);
@@ -46,19 +46,19 @@ public class InfoGetter {
 
             //    System.out.println(frameName + "    " + pos + "   " + frameSize);
                 if (frameName.equals(FrameTypes.BAND)) {
-                    setFrameInfo(song.getFrameList().get(FrameTypes.BAND), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos, tagSize);
+                    setFrameInfo(song.getFrameList().get(FrameTypes.BAND), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos);
                 }
                 if (frameName.equals(FrameTypes.SONG)) {
-                    setFrameInfo(song.getFrameList().get(FrameTypes.SONG), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos, tagSize);
+                    setFrameInfo(song.getFrameList().get(FrameTypes.SONG), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos);
                 }
                 if (frameName.equals(FrameTypes.ALBUM)) {
-                    setFrameInfo(song.getFrameList().get(FrameTypes.ALBUM), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos, tagSize);
+                    setFrameInfo(song.getFrameList().get(FrameTypes.ALBUM), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos);
                 }
                 if (frameName.equals(FrameTypes.YEAR)) {
-                    setFrameInfo(song.getFrameList().get(FrameTypes.YEAR), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos, tagSize);
+                    setFrameInfo(song.getFrameList().get(FrameTypes.YEAR), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos);
                 }
                 if (frameName.equals(FrameTypes.GENRE)) {
-                    setFrameInfo(song.getFrameList().get(FrameTypes.GENRE), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos, tagSize);
+                    setFrameInfo(song.getFrameList().get(FrameTypes.GENRE), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos);
                 }
 
                 if (pos + frameSize > lenght) {
@@ -73,7 +73,7 @@ public class InfoGetter {
     }
 
     private int getTagSize() { // size of all tag
-        return (headerArray[9] & 0xFF) | ((headerArray[8] & 0xFF) << 7) | ((headerArray[7] & 0xFF) << 14) | ((headerArray[6] & 0xFF) << 21) + 10;
+        return (headerArray[9] & 0xFF) | ((headerArray[8] & 0xFF) << 7) | ((headerArray[7] & 0xFF) << 14) | ((headerArray[6] & 0xFF) << 21);
     }
 
     private String parseTextField(final byte[] buffer, int pos, int size) {
@@ -83,15 +83,13 @@ public class InfoGetter {
         if (charcode == 0) charset = Charset.forName("ISO-8859-1");
         else if (charcode == 3) charset = Charset.forName("UTF-8");
         else charset = Charset.forName("UTF-16");
-        System.out.println("Chatcode  " + charcode);
         return charset.decode(ByteBuffer.wrap(buffer, pos + 1, size - 1)).toString();
     }
 
-    private void setFrameInfo(Frame frame, String value, int frameSize, int id3FrameSize, int pos, long tagSize) {
+    private void setFrameInfo(Frame frame, String value, int frameSize, int id3FrameSize, int pos) {
         frame.setFrameValue(value);
         frame.setFrameSize(frameSize);
         frame.setId3FrameSize(id3FrameSize);
         frame.setPositionInFile(pos);
-        frame.setTagSize(tagSize);
     }
 }
