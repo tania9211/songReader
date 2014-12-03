@@ -10,11 +10,7 @@ import java.io.RandomAccessFile;
 /**
  * Created by BiliaievaTatiana on 11/27/14.
  */
-public class TestReadInfo extends TestCase{
-    //test find file
-    //test set new frame - read
-    //test set info to file
-    //test set list info
+public class TestReadInfo extends TestCase {
 
     private byte[] setHeaderArray() {
         byte[] headerArray = new byte[Config.HEADER_ARRAY_SIZE];
@@ -47,45 +43,26 @@ public class TestReadInfo extends TestCase{
                 (byte) value};
     }
 
-
-    @Test
-    public void testFindFile() {
-        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/test23.mp3");
+    private Song initSong(String songName) {
+        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/" + songName + ".mp3");
         try {
             RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
             byte[] headerArray = setHeaderArray();
 
             randomAccessFile.write(headerArray);
+            song.setTagSize(headerArray.length);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        song.setSongName("Name");
-        song.setBandName("Band Name");
-        song.readInfo();
-        System.out.println(song.getSongName().length());
-        System.out.println(song.getBandName().length());
-        song.setGenre("Genre");
-        song.readInfo();
-        System.out.println(song.getSongName());
-        System.out.println(song.getBandName());
-        System.out.println(song.getGenre());
+
+        return song;
     }
 
     @Test
     public void testSetName() {
-        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/testName.mp3");
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] headerArray = setHeaderArray();
-
-            randomAccessFile.write(headerArray);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Song song = initSong("testSongName");
         String name = "SongName";
         song.setSongName(name);
         song.readInfo();
@@ -98,22 +75,13 @@ public class TestReadInfo extends TestCase{
 
         song.setSongName("Ku ku tyuyuyu");
         song.readInfo();
-       //assertFalse(song.getSongName().equals(name));
+        assertFalse(song.getSongName().equals(name));
     }
 
- //   @Test
+    @Test
     public void testBandName() {
-        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/testNandName.mp3");
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] headerArray = setHeaderArray();
+        Song song = initSong("testBandName");
 
-            randomAccessFile.write(headerArray);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         String name = "BandName";
         song.setBandName(name);
         song.readInfo();
@@ -125,19 +93,10 @@ public class TestReadInfo extends TestCase{
         assertEquals(name, song.getBandName());
     }
 
-  //  @Test
+    @Test
     public void testAlbumName() {
-        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/testAlbum.mp3");
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] headerArray = setHeaderArray();
+        Song song = initSong("testAlbum");
 
-            randomAccessFile.write(headerArray);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         String name = "BandName";
         song.setAlbumName(name);
         song.readInfo();
@@ -149,19 +108,10 @@ public class TestReadInfo extends TestCase{
         assertEquals(name, song.getAlbumName());
     }
 
-//    @Test
+    @Test
     public void testGenre() {
-        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/testGenre.mp3");
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] headerArray = setHeaderArray();
+        Song song = initSong("testGenre");
 
-            randomAccessFile.write(headerArray);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         String name = "Pop";
         song.setGenre(name);
         song.readInfo();
@@ -173,19 +123,10 @@ public class TestReadInfo extends TestCase{
         assertEquals(name, song.getGenre());
     }
 
-   // @Test
-    public void testYear() {
-        Song song = new Song("C:/Users/biliaievaTatiana/Downloads/testYear.mp3");
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] headerArray = setHeaderArray();
+    @Test
+    public void testYear() { // wrong data
+        Song song = initSong("testYear");
 
-            randomAccessFile.write(headerArray);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         String name = "1992";
         song.setYear(name);
         song.readInfo();
@@ -195,5 +136,56 @@ public class TestReadInfo extends TestCase{
         song.setYear(name);
         song.readInfo();
         assertEquals(name, song.getYear());
+
+        name = "20142";
+        song.setYear(name);
+        song.readInfo();
+        assertEquals(name, song.getYear());
+
+        name = "2014";
+        song.setYear(name);
+        song.readInfo();
+        assertEquals(name, song.getYear());
+    }
+
+    @Test
+    public void testFewChanges() {
+        Song song = initSong("fewChanges");
+
+        String songName = "Ya ya ya";
+        String year = "2014";
+        String band = "Randy Marsh";
+        String genre = "popsa";
+        String album = "ya ya ya album";
+
+        song.setSongName(songName);
+        song.setGenre(genre);
+        song.setAlbumName(album);
+        song.setYear(year);
+        song.setBandName(band);
+
+        assertEquals(song.getSongName(), songName);
+        assertEquals(song.getGenre(), genre);
+        assertEquals(song.getAlbumName(), album);
+        assertEquals(song.getYear(), year);
+        assertEquals(song.getBandName(), band);
+
+        songName = "Yaya";
+        year = "2015";
+        band = "Randy Marsh Gay";
+        genre = "pop";
+        album = "ya ya ya #";
+
+        song.setSongName(songName);
+        song.setGenre(genre);
+        song.setAlbumName(album);
+        song.setYear(year);
+        song.setBandName(band);
+
+        assertEquals(song.getSongName(), songName);
+        assertEquals(song.getGenre(), genre);
+        assertEquals(song.getAlbumName(), album);
+        assertEquals(song.getYear(), year);
+        assertEquals(song.getBandName(), band);
     }
 }
