@@ -26,7 +26,15 @@ class Song extends File {
         infoGetter = new InfoGetter();
         infoSetter = new InfoSetter(this);
         frameList = setFrameList();
-        //     infoGetter.readInfo(this);
+      //  infoGetter.readInfo(this);
+    }
+
+    public Song(Song song, String child) {
+        super(song, child);
+
+        infoGetter = new InfoGetter();
+        infoSetter = new InfoSetter(this);
+        frameList = setFrameList();
     }
 
     public void setTagSize(int tagSize){
@@ -120,5 +128,17 @@ class Song extends File {
     public String getGenre() {
         return frameList.get(FrameTypes.GENRE) != null && frameList.get(FrameTypes.GENRE).getFrameValue() != null
                 ? frameList.get(FrameTypes.GENRE).getFrameValue() : "";
+    }
+
+    //tempVoid
+    public void setMap(String s1, String s2, String s3, String s4) {
+        HashMap <Frame, String> frameStringMap = new HashMap<Frame, String>();
+
+        frameStringMap.put(frameList.get(FrameTypes.BAND), s1);
+        frameStringMap.put(frameList.get(FrameTypes.ALBUM), s2);
+        frameStringMap.put(frameList.get(FrameTypes.GENRE), s3);
+        frameStringMap.put(frameList.get(FrameTypes.YEAR), s4);
+
+        infoSetter.setInfo(this, frameStringMap);
     }
 }

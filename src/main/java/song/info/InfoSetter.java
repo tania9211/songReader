@@ -3,6 +3,7 @@ package song.info;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.*;
 
 /**
  * Created by BiliaievaTatiana on 11/19/14.
@@ -65,97 +66,27 @@ public class InfoSetter {
         }
     }
 
-   /* public void setInfo1(Song song, Frame frame, String value) {
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] bytes = new byte[song.getTagSize()];
-            randomAccessFile.read(bytes);
-            randomAccessFile.seek(0);
+    public void setInfo(Song song, HashMap<Frame, String> framesMap) {
+        List list = new LinkedList(framesMap.entrySet());
 
-            byte[] bytesOfValue = value.getBytes();
-
-            int dif = bytesOfValue.length - frame.getFrameSize() + 1;
-            int length = frame.getPositionInFile() + Config.HEADER_ARRAY_SIZE + frame.getId3FrameSize();
-
-            if (dif > 0) { //lenght of value bigger that frame
-                System.out.println("dif > 0");
-                byte[] tempArray = new byte[bytes.length + dif];
-                //set bytes before frame
-                for (int i = 0; i < length; i++) {
-                    tempArray[i] = bytes[i];
-                }
-
-                tempArray[length] = 0;
-                length++;
-                //set bytes of frame value
-                for (int i = length; i < length + bytesOfValue.length; i++) {
-                    tempArray[i] = bytesOfValue[i - length];
-                }
-                length = length + bytesOfValue.length;
-                //set bytes after frame
-                for (int i = length; i < tempArray.length; i++) {
-                    tempArray[i] = bytes[i - dif];
-                }
-
-                changeFrameSize(frame, value, tempArray);
-
-                //change tag Size
-                byte[] tagSizeByte = toByteArray(tempArray.length - 10);
-                for (int i = 0; i < tagSizeByte.length; i++) {
-                    tempArray[6 + i] = tagSizeByte[i];
-                }
-
-                //write tempArray to file
-                randomAccessFile.write(tempArray);
-                //   changeHeaderSize(song, tempArray.length);
-            } else {
-                if (dif < 0) { //lenght of frame less that frame
-                    //set charcode (temp for UTF-8)
-                    if (bytes[length] != 3) {
-                        bytes[length] = 3;
-                    }
-                    length++;
-                    System.out.println("dif < 0");
-                    System.out.println(dif + "  " + frame.getFrameSize());
-                    System.out.println(frame.getFrameValue().length());
-                    //set value
-                    for (int i = 0; i < bytesOfValue.length; i++) {
-                        bytes[length + i] = bytesOfValue[i];
-                        //             System.out.println(i + "   " + (length + i));
-                    }
-
-                    dif = dif * (-1);
-                    //create emlty array with dif length
-                    StringBuffer stringBuffer = new StringBuffer(dif);
-                    for (int i = 0; i < dif; i++) {
-                        stringBuffer.append(" ");
-                    }
-                    byte[] emptyArray = stringBuffer.toString().getBytes();
-                    length = length + bytesOfValue.length;
-                    //set first dif symbols to empty array
-                    for (int i = 0; i < dif; i++) {
-                        bytes[length + i] = emptyArray[i];
-                        //          System.out.println(i + "   " + (length + i));
-                    }
-                } else { //lenght of frame and value are equals
-                    System.out.println("dif = 0");
-                    for (int i = 0; i < bytesOfValue.length; i++) {
-                        bytes[length + i] = bytesOfValue[i];
-                    }
-                }
-
-                randomAccessFile.write(bytes);
-                song.readInfo();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(((Frame) framesMap.keySet().toArray()[i]).getPositionInFile());
         }
-    }*/
 
-    public void setInfo(Song song, String value) {
-        System.out.println("set newingp");
+        Collections.sort(list, new Comparator<Map.Entry>() {
+            public int compare(Map.Entry o1, Map.Entry o2) {
+                return ((Frame) o2.getKey()).getPositionInFile() - ((Frame) o1.getKey()).getPositionInFile();
+            }
+        });
+
+        Iterator it = list.iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            System.out.println(((Frame) pairs.getKey()).getPositionInFile() + " = " + pairs.getValue());
+            setInfo(song, (Frame) pairs.getKey(), (String) pairs.getValue());
+            it.remove();
+        }
+        song.readInfo();
     }
 
     public void setNewFrameInfo(Song song, Frame frame, String value) {
@@ -224,92 +155,6 @@ public class InfoSetter {
             array[tagSizeBeginPosition + i] = sizeBytes[i];
         }
     }
-
-  /*  public void setInfoToNewFrame(Song song, Frame frame, String value) { //wrong void (not use)
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            //    byte[] headerArrayBytes = new byte[Config.HEADER_ARRAY_SIZE];
-            //     randomAccessFile.read(headerArrayBytes);
-            //    int tagSize = (headerArrayBytes[9] & 0xFF) | ((headerArrayBytes[8] & 0xFF) << 7) | ((headerArrayBytes[7] & 0xFF) << 14) | ((headerArrayBytes[6] & 0xFF) << 21) + 10;
-            //     System.out.println("Setter " + tagSize);
-            //   byte[] anotherBytesInFile = new byte[tagSize - Config.HEADER_ARRAY_SIZE];
-            byte[] bytesInOldFile = new byte[song.getTagSize()];
-            randomAccessFile.read(bytesInOldFile);
-            //      randomAccessFile.seek(Config.HEADER_ARRAY_SIZE);
-            randomAccessFile.seek(0);
-
-            value = value + " ";
-            byte[] arrayOfValue = value.getBytes("UTF-8");
-            byte[] arrayOfTypeValue = frame.getFrameName().getBytes("UTF-8");
-            byte[] arrayOfSizeValue = toByteArray(value.length());
-
-            int frameLength = arrayOfValue.length + bytesInOldFile.length + arrayOfSizeValue.length + 3 + arrayOfTypeValue.length;
-            byte[] newFileArray = new byte[frameLength];
-            //set info before frame (header info)
-            for (int i = 0; i < Config.HEADER_ARRAY_SIZE; i++) {
-                newFileArray[i] = bytesInOldFile[i];
-            }
-            //int length = arrayOfTypeValue.length;
-            int length = Config.HEADER_ARRAY_SIZE;
-            //frame (type-(4 bytes), size-(4 bytes), flags-(2 bytes),encoding-(1 byte) value-(n+1 bytes))
-            //set type of frame
-            for (int i = length, j = 0; i < length + arrayOfTypeValue.length; i++, j++) {
-                newFileArray[i] = arrayOfTypeValue[j];
-            }
-            length = length + arrayOfTypeValue.length;
-            //set size of frame
-            for (int i = length, j = 0; i < length + arrayOfTypeValue.length; i++, j++) {
-                newFileArray[i] = arrayOfSizeValue[j];
-            }
-            length = length + arrayOfTypeValue.length;
-            //set flags empty bytes
-            newFileArray[length] = 0;
-            newFileArray[length + 1] = 0;
-            //set encoding (3 mean UTF-8) temp ???
-            newFileArray[length + 2] = 0;
-            length = length + 3;
-            //set value of frame
-            for (int i = length, j = 0; i < arrayOfValue.length + length; i++, j++) {
-                newFileArray[i] = arrayOfValue[j];
-            }
-
-            length = length + arrayOfValue.length - 1;
-            //set another file to array content
-            for (int i = length, j = Config.HEADER_ARRAY_SIZE; i < length + bytesInOldFile.length - Config.HEADER_ARRAY_SIZE; i++, j++) {
-                newFileArray[i] = bytesInOldFile[j];
-            }
-            //set new tag size
-            byte[] tagSizeByte = toByteArray(newFileArray.length - 10);
-            for (int i = 0; i < tagSizeByte.length; i++) {
-                newFileArray[6 + i] = tagSizeByte[i];
-            }
-            //write array to file
-            randomAccessFile.write(newFileArray);
-            ///     changeHeaderSize(song, newFileArray.length);
-            song.readInfo();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-   /* private void changeHeaderSize(Song song, int length) {
-        try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(song, "rw");
-            byte[] tagSizeByte = toByteArray(length);
-            if (randomAccessFile.length() >= 10) {
-                randomAccessFile.seek(6);
-                for (int i = 0; i < tagSizeByte.length; i++) {
-                    randomAccessFile.write(tagSizeByte[i]);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
 
     private void changeFrameSize(Frame frame, String value, byte[] array) {
         byte[] valueToBytes = toByteArray(value.length() + 1);

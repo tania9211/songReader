@@ -44,7 +44,6 @@ public class InfoGetter {
                     frameSize = (buffer[pos + 7] & 0xFF) | ((buffer[pos + 6] & 0xFF) << 8) | ((buffer[pos + 5] & 0xFF) << 16) | ((buffer[pos + 4] & 0xFF) << 24);
                 }
 
-            //    System.out.println(frameName + "    " + pos + "   " + frameSize);
                 if (frameName.equals(FrameTypes.BAND)) {
                     setFrameInfo(song.getFrameList().get(FrameTypes.BAND), parseTextField(buffer, pos + id3FrameSize, frameSize), frameSize, id3FrameSize, pos);
                 }
